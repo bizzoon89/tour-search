@@ -23,6 +23,7 @@ export const SearchForm = ({ onSubmit }: { onSubmit: (data: { destination: GeoEn
           onChange={setDestination}
         />
       </div>
+
       <Button type='submit'>Знайти</Button>
     </form>
   );
