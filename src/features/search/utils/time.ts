@@ -17,3 +17,10 @@ export const waitUntil = async (iso: string, signal?: AbortSignal) => {
   const diff = new Date(iso).getTime() - Date.now();
   if (diff > 0) await delay(diff, signal);
 };
+
+export const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  return d.toLocaleDateString('uk-UA');
+};
+
+export const formatMoney = (v: number) => v.toLocaleString('uk-UA') + ' $';

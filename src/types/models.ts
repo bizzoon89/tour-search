@@ -44,3 +44,11 @@ export type SearchToursState = {
   resultsByCountry: Record<string, SearchToursResult>;
   currentCountryId: string | null;
 };
+
+export type TourAggregate = {
+  id: string;
+  amount: number;
+  startDate: string;
+  endDate: string;
+  hotel: Hotel;
+};

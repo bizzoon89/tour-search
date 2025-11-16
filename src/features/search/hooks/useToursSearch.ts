@@ -1,7 +1,10 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import type { ErrorResponse } from '../../../types/errors';
 import { runSearchFlow } from '../services/runSearchFlow';
-import type { SearchToursResult, SearchToursState } from '../../../types/models';
+import type { SearchToursResult, SearchToursState, PriceOffer, TourAggregate, HotelsMap } from '../../../types/models';
+import { getHotels } from '../../../api/api';
+
+const hotelsCache: Record<string, HotelsMap> = {};
 
 const initialState: SearchToursState = {
   status: 'idle',
@@ -18,6 +21,27 @@ export const useToursSearch = () => {
     if (!state.currentCountryId) return null;
     return state.resultsByCountry[state.currentCountryId] || null;
   }, [state.currentCountryId, state.resultsByCountry]);
+
+  const buildAggregatedResults = useCallback(
+    async (countryId: string, prices: Record<string, PriceOffer>): Promise<TourAggregate[]> => {
+      // 1. кеш готелів
+      if (!hotelsCache[countryId]) {
+        const resp = await getHotels(countryId);
+        hotelsCache[countryId] = await resp.json();
+      }
+
+      const hotels = hotelsCache[countryId];
+
+      return Object.values(prices).map(p => ({
+        id: p.id,
+        amount: p.amount,
+        startDate: p.startDate,
+        endDate: p.endDate,
+        hotel: hotels[p.hotelID!],
+      }));
+    },
+    []
+  );
 
   const searchTours = useCallback(
     async (countryId: string) => {
@@ -83,5 +107,6 @@ export const useToursSearch = () => {
     ...state,
     currentResult,
     searchTours,
+    buildAggregatedResults,
   };
 };
