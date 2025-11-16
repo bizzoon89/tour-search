@@ -1,8 +1,10 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
+
 import type { ErrorResponse } from '../../../types/errors';
+import type { SearchToursState, SearchToursResult, TourAggregate, HotelsMap, PricesMap } from '../../../types/models';
+
+import { getHotels, stopSearchPrices } from '../../../api/api';
 import { runSearchFlow } from '../services/runSearchFlow';
-import type { SearchToursResult, SearchToursState, PriceOffer, TourAggregate, HotelsMap } from '../../../types/models';
-import { getHotels } from '../../../api/api';
 
 const hotelsCache: Record<string, HotelsMap> = {};
 
@@ -15,33 +17,58 @@ const initialState: SearchToursState = {
 
 export const useToursSearch = () => {
   const [state, setState] = useState<SearchToursState>(initialState);
+
+  const activeTokenRef = useRef<string | null>(null);
+
+  const abortMark = useRef(0);
+
   const abortRef = useRef<AbortController | null>(null);
+
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const currentResult: SearchToursResult | null = useMemo(() => {
     if (!state.currentCountryId) return null;
     return state.resultsByCountry[state.currentCountryId] || null;
   }, [state.currentCountryId, state.resultsByCountry]);
 
-  const buildAggregatedResults = useCallback(
-    async (countryId: string, prices: Record<string, PriceOffer>): Promise<TourAggregate[]> => {
-      // 1. кеш готелів
-      if (!hotelsCache[countryId]) {
-        const resp = await getHotels(countryId);
-        hotelsCache[countryId] = await resp.json();
-      }
+  const buildAggregatedResults = useCallback(async (countryId: string, prices: PricesMap): Promise<TourAggregate[]> => {
+    if (!hotelsCache[countryId]) {
+      const resp = await getHotels(countryId);
+      hotelsCache[countryId] = await resp.json();
+    }
 
-      const hotels = hotelsCache[countryId];
+    const hotels = hotelsCache[countryId];
 
-      return Object.values(prices).map(p => ({
-        id: p.id,
-        amount: p.amount,
-        startDate: p.startDate,
-        endDate: p.endDate,
-        hotel: hotels[p.hotelID!],
-      }));
-    },
-    []
-  );
+    return Object.values(prices).map(p => ({
+      id: p.id,
+      amount: p.amount,
+      startDate: p.startDate,
+      endDate: p.endDate,
+      hotel: hotels[p.hotelID!],
+    }));
+  }, []);
+
+  const cancelActiveSearch = useCallback(async () => {
+    if (!activeTokenRef.current) return;
+
+    setIsCancelling(true);
+
+    try {
+      await stopSearchPrices(activeTokenRef.current);
+    } catch {
+      /* empty */
+    }
+
+    activeTokenRef.current = null;
+
+    abortMark.current += 1;
+
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+
+    setIsCancelling(false);
+  }, []);
 
   const searchTours = useCallback(
     async (countryId: string) => {
@@ -58,9 +85,16 @@ export const useToursSearch = () => {
         return;
       }
 
+      if (activeTokenRef.current) {
+        await cancelActiveSearch();
+      }
+
       if (abortRef.current) abortRef.current.abort();
       const controller = new AbortController();
       abortRef.current = controller;
+
+      abortMark.current += 1;
+      const myMark = abortMark.current;
 
       setState(prev => ({
         ...prev,
@@ -70,10 +104,14 @@ export const useToursSearch = () => {
       }));
 
       try {
-        const prices = await runSearchFlow(countryId, {
+        const { prices, token } = await runSearchFlow(countryId, {
           maxRetries: 2,
           signal: controller.signal,
         });
+
+        activeTokenRef.current = token;
+
+        if (myMark !== abortMark.current) return;
 
         setState(prev => ({
           ...prev,
@@ -83,7 +121,7 @@ export const useToursSearch = () => {
             ...prev.resultsByCountry,
             [countryId]: {
               countryId,
-              prices,
+              prices: prices as PricesMap,
               receivedAt: Date.now(),
             },
           },
@@ -91,7 +129,7 @@ export const useToursSearch = () => {
       } catch (err) {
         const e = err as ErrorResponse;
 
-        if (controller.signal.aborted) return;
+        if (controller.signal.aborted || myMark !== abortMark.current) return;
 
         setState(prev => ({
           ...prev,
@@ -100,7 +138,7 @@ export const useToursSearch = () => {
         }));
       }
     },
-    [state.resultsByCountry]
+    [state.resultsByCountry, cancelActiveSearch]
   );
 
   return {
@@ -108,5 +146,6 @@ export const useToursSearch = () => {
     currentResult,
     searchTours,
     buildAggregatedResults,
+    isCancelling,
   };
 };

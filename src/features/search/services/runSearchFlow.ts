@@ -6,7 +6,7 @@ import { delay, waitUntil } from '../utils/time';
 export const runSearchFlow = async (
   countryId: string,
   options: { maxRetries?: number; signal?: AbortSignal } = {}
-): Promise<PricesMap> => {
+): Promise<{ prices: PricesMap; token: string }> => {
   const { maxRetries = 2, signal } = options;
 
   const { token, waitUntil: initialWait } = await apiClient.startSearchPrices(countryId);
@@ -19,7 +19,8 @@ export const runSearchFlow = async (
 
     try {
       const { prices } = await apiClient.getSearchPrices(token);
-      return prices;
+
+      return { prices, token };
     } catch (err) {
       const e = err as ErrorResponse;
 
