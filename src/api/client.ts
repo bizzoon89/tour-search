@@ -2,7 +2,7 @@
 
 import * as api from './api';
 import type { ErrorResponse } from '../types/errors';
-import type { CountriesMap, GeoResponse } from '../types/models';
+import type { CountriesMap, GeoResponse, Hotel, PriceOffer } from '../types/models';
 import type { GetSearchPricesResponse, StartSearchResponse, StopSearchResponse } from '../types/apiResponses';
 
 const toJson = async <T>(promise: Promise<Response>): Promise<T> => {
@@ -32,4 +32,6 @@ export const apiClient = {
   startSearchPrices: (countryID: string) => toJson<StartSearchResponse>(api.startSearchPrices(countryID)),
   getSearchPrices: (token: string) => toJson<GetSearchPricesResponse>(api.getSearchPrices(token)),
   stopSearchPrices: (token: string) => toJson<StopSearchResponse>(api.stopSearchPrices(token)),
+  getPrice: (priceId: string) => toJson<PriceOffer>(api.getPrice(priceId)),
+  getHotel: (hotelId: number | string) => toJson<Hotel>(api.getHotel(Number(hotelId))),
 };

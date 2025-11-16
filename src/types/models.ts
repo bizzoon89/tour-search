@@ -10,6 +10,15 @@ export type Hotel = {
   cityName: string;
   countryId: string;
   countryName: string;
+  description?: string;
+  services?: {
+    wifi?: 'yes' | 'no';
+    aquapark?: 'yes' | 'no';
+    meals?: 'yes' | 'no';
+    tennis_court?: 'yes' | 'no';
+    laundry?: 'yes' | 'no';
+    parking?: 'yes' | 'no';
+  };
 };
 
 export type CountriesMap = Record<string, Country>;

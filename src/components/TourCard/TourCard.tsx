@@ -1,11 +1,12 @@
+import { Link } from 'react-router-dom';
 import { formatDate, formatMoney } from '../../features/search/utils/time';
 import type { TourAggregate } from '../../types/models';
 
-type Props = {
+type propsTourCard = {
   tour: TourAggregate;
 };
 
-export const TourCard = ({ tour }: Props) => {
+export const TourCard = ({ tour }: propsTourCard) => {
   const h = tour.hotel;
 
   return (
@@ -30,12 +31,12 @@ export const TourCard = ({ tour }: Props) => {
 
       <div className='text-xl font-bold mt-1'>{formatMoney(tour.amount)}</div>
 
-      <a
-        href={`/price/${tour.id}`}
+      <Link
+        to={`/tour/${tour.id}/${h.id}`}
         className='mt-auto inline-block text-blue-600 hover:underline font-medium'
       >
         Відкрити ціну
-      </a>
+      </Link>
     </div>
   );
 };
