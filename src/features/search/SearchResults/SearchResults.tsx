@@ -1,11 +1,11 @@
-import { TourCard } from '../../../components/TourCard/TourCard';
+import { TourCard } from '../../../components/TourCard';
 import type { TourAggregate } from '../../../types/models';
 
-type Props = {
+type SearchResultsProps = {
   results: TourAggregate[];
 };
 
-export const SearchResults = ({ results }: Props) => {
+export const SearchResults = ({ results }: SearchResultsProps) => {
   if (results.length === 0) {
     return <div className='w-[700px] mx-auto p-6 text-center text-gray-500'>За вашим запитом турів не знайдено</div>;
   }

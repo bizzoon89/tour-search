@@ -1,11 +1,11 @@
 import cn from 'classnames';
 import { forwardRef, type DetailedHTMLProps, type ForwardedRef, type InputHTMLAttributes } from 'react';
 
-interface propsInput extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
+interface InputProps extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   className?: string;
 }
 
-export const Input = forwardRef(({ className, ...props }: propsInput, ref: ForwardedRef<HTMLInputElement>) => (
+export const Input = forwardRef(({ className, ...props }: InputProps, ref: ForwardedRef<HTMLInputElement>) => (
   <input
     ref={ref}
     className={cn(

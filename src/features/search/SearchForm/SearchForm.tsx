@@ -3,7 +3,9 @@ import type { GeoEntity } from '../../../types/models';
 import { Button } from '../../../components/Button';
 import { SearchField } from '../SearchField';
 
-export const SearchForm = ({ onSubmit }: { onSubmit: (data: { destination: GeoEntity | null }) => void }) => {
+type SearchFormProps = { onSubmit: (data: { destination: GeoEntity | null }) => void };
+
+export const SearchForm = ({ onSubmit }: SearchFormProps) => {
   const [destination, setDestination] = useState<GeoEntity | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -5,13 +5,12 @@ import { useSearchApi } from '../hooks/useSearchApi';
 import type { GeoEntity } from '../../../types/models';
 import { SearchDropdown } from '../../../components/SearchDropdown';
 
-export const SearchField = ({
-  value,
-  onChange,
-}: {
+type SearchFieldProps = {
   value: GeoEntity | null;
   onChange: (v: GeoEntity | null) => void;
-}) => {
+};
+
+export const SearchField = ({ value, onChange }: SearchFieldProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);

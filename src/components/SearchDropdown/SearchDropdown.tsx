@@ -16,17 +16,14 @@ const renderIcon = (type: GeoEntity['type']) => {
   }
 };
 
-export const SearchDropdown = ({
-  visible,
-  loading,
-  items,
-  onSelect,
-}: {
+type SearchDropdownProps = {
   visible: boolean;
   loading: boolean;
   items: GeoEntity[];
   onSelect: (entity: GeoEntity) => void;
-}) => {
+};
+
+export const SearchDropdown = ({ visible, loading, items, onSelect }: SearchDropdownProps) => {
   return (
     <Dropdown visible={visible}>
       {loading && <Loader />}

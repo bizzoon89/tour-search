@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
 
-type propsDropdown = {
+type DropdownProps = {
   visible: boolean;
   children: ReactNode;
 };
 
-export const Dropdown = ({ visible, children }: propsDropdown) =>
+export const Dropdown = ({ visible, children }: DropdownProps) =>
   visible ? (
     <div className='absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10'>
       {children}

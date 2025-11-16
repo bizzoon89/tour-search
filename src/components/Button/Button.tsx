@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import type { ButtonHTMLAttributes, DetailedHTMLProps, ReactNode } from 'react';
 
-interface propsButton extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
+interface ButtonProps extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
   children: ReactNode;
   variant?: 'primary';
   className?: string;
 }
 
-export const Button = ({ variant = 'primary', children, className, ...props }: propsButton) => {
+export const Button = ({ variant = 'primary', children, className, ...props }: ButtonProps) => {
   return (
     <button
       className={cn(
