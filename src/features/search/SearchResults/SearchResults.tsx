@@ -10,10 +10,12 @@ export const SearchResults = ({ results }: SearchResultsProps) => {
     return <div className='w-[700px] mx-auto p-6 text-center text-gray-500'>За вашим запитом турів не знайдено</div>;
   }
 
+  const sorted = [...results].sort((a, b) => a.amount - b.amount);
+
   return (
     <div className='max-[700px]: mx-auto p-[25px]'>
       <div className='grid gap-4 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]'>
-        {results.map(tour => (
+        {sorted.map(tour => (
           <TourCard
             key={tour.id}
             tour={tour}
