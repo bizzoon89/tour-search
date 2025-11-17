@@ -29,13 +29,19 @@ This project is a **React + TypeScript + Vite** application that implements a fu
 ## ⚙️ Installation
 
 ```bash
-https://github.com/bizzoon89/tour-search
+# 1. Clone the repository
+git clone https://github.com/bizzoon89/tour-search.git
+cd tour-search
 
+
+# 2. Install dependencies
 npm install
 
+# 3. Dev Server
 npm run dev
 # open http://localhost:5173
 
+# 4. Build & Preview
 npm run build
 npm run preview
 ```
